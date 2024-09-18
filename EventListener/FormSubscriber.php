@@ -70,7 +70,7 @@ class FormSubscriber implements EventSubscriberInterface
     ) {
         $this->eventDispatcher = $eventDispatcher;
         $this->recaptchaClient = $recaptchaClient;
-        $integration     = $integrationsHelper->getIntegration(RecaptchaIntegration::INTEGRATION_NAME);
+        $integration     = $integrationsHelper->getIntegration(RecaptchaIntegration::NAME);
 
         if ($integration && $integration->getIntegrationConfiguration()->getIsPublished()) {
             

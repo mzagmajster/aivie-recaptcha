@@ -1,18 +1,11 @@
 <?php
 
-/*
- * @copyright   2018 Konstantin Scheumann. All rights reserved
- * @author      Konstantin Scheumann
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
+declare(strict_types=1);
 
 namespace MauticPlugin\MauticRecaptchaBundle;
 
-use Mautic\PluginBundle\Bundle\PluginBundleBase;
+use Mautic\IntegrationsBundle\Bundle\AbstractPluginBundle;
 
-/**
- * Class MauticRecaptchaBundle.
- */
-class MauticRecaptchaBundle extends PluginBundleBase
+class MauticRecaptchaBundle extends AbstractPluginBundle
 {
 }

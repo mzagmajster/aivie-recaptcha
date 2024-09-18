@@ -8,9 +8,10 @@
 return [
     'name'        => 'reCAPTCHA',
     'description' => 'Enables reCAPTCHA integration.',
-    'version'     => '1.0',
+    'version'     => '1.0.1',
     'author'      => 'Adrian Schimpf',
     'routes' => [],
+    'menu' => [],
     'services' => [
         'events' => [
             'mautic.recaptcha.event_listener.form_subscriber' => [
@@ -56,6 +57,14 @@ return [
                 ],
                 'tags'      => [
                     'mautic.basic_integration',
+                ],
+            ],
+            // Provides the form types to use for the configuration UI
+            'mautic.integration.recaptcha.configuration' => [
+                'class'     => \MauticPlugin\MauticRecaptchaBundle\Integration\Support\ConfigSupport::class,
+                'arguments' => [],
+                'tags'      => [
+                    'mautic.config_integration',
                 ],
             ],
         ],

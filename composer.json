@@ -1,15 +1,22 @@
 {
-    "name": "aiviemarketing/mautic-recaptcha",
-    "description": "This plugin brings reCAPTCHA integration to Aivie and mautic.",
-    "type": "mautic-plugin",
-    "license": "GPL-3.0-only",
-    "authors": [
-        {
-            "name": "Adrian Schimpf",
-            "email": "dev@aivie.ch"
-        }
-    ],
-    "require": {
-        "google/cloud-recaptcha-enterprise": "^1.15"
+  "name": "aiviemarketing/mautic-recaptcha",
+  "description": "This plugin brings reCAPTCHA integration to Aivie and mautic.",
+  "type": "mautic-plugin",
+  "version": "1.0.1",
+  "license": "GPL-3.0-only",
+  "authors": [
+    {
+      "name": "Adrian Schimpf",
+      "email": "dev@aivie.ch"
     }
+  ],
+  "keywords": ["mautic","plugin","integration","aivie"],
+  "require": {
+    "php": ">=7.4.0 <8.1",
+    "mautic/core-lib": "^4.0",
+    "google/cloud-recaptcha-enterprise": "^1.15"
+  },
+  "extra": {
+    "install-directory-name": "MauticRecaptchaBundle"
+  }
 }

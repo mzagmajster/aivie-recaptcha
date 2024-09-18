@@ -8,21 +8,18 @@
 
 namespace MauticPlugin\MauticRecaptchaBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\Event\ValidationEvent;
 use Mautic\FormBundle\FormEvents;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
 use MauticPlugin\MauticRecaptchaBundle\Form\Type\RecaptchaType;
 use MauticPlugin\MauticRecaptchaBundle\Integration\RecaptchaIntegration;
 use MauticPlugin\MauticRecaptchaBundle\RecaptchaEvents;
 use MauticPlugin\MauticRecaptchaBundle\Service\RecaptchaClient;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -66,16 +63,16 @@ class FormSubscriber implements EventSubscriberInterface
      */
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
-        IntegrationHelper $integrationHelper,
+        IntegrationsHelper $integrationsHelper,
         RecaptchaClient $recaptchaClient,
         LeadModel $leadModel,
         TranslatorInterface $translator
     ) {
         $this->eventDispatcher = $eventDispatcher;
         $this->recaptchaClient = $recaptchaClient;
-        $integration     = $integrationHelper->getIntegrationObject(RecaptchaIntegration::INTEGRATION_NAME);
-        
-        if ($integration && $integration->getIntegrationSettings()->getIsPublished()) {
+        $integration     = $integrationsHelper->getIntegration(RecaptchaIntegration::INTEGRATION_NAME);
+
+        if ($integration && $integration->getIntegrationConfiguration()->getIsPublished()) {
             
             $this->siteKey   = getenv('GC_RECAPTCHA_SITE_KEY');
 

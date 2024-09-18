@@ -8,15 +8,13 @@
 
 namespace MauticPlugin\MauticRecaptchaBundle\Tests;
 
-use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Event\ValidationEvent;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
 use MauticPlugin\MauticRecaptchaBundle\EventListener\FormSubscriber;
 use MauticPlugin\MauticRecaptchaBundle\Integration\RecaptchaIntegration;
 use MauticPlugin\MauticRecaptchaBundle\Service\RecaptchaClient;
-use PHPUnit\Framework\MockObject\MockBuilder;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -24,24 +22,11 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class IntegrationTest extends TestCase
 {
+    protected RecaptchaIntegration $integration;
 
-    const RECAPTCHA_TESTING_SITE_KEY = '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI';
-    const RECAPTCHA_TESTING_SECRET_KEY = '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe';
+    protected IntegrationsHelper $integrationsHelper;
 
-    /**
-     * @var RecaptchaIntegration
-     */
-    protected $integration;
-
-    /**
-     * @var IntegrationHelper
-     */
-    protected $integrationHelper;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $eventDispatcher;
+    protected EventDispatcherInterface $eventDispatcher;
 
     protected function setUp(): void
     {
@@ -51,10 +36,6 @@ class IntegrationTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->integration
-            ->method('getKeys')
-            ->willReturn(['site_key' => self::RECAPTCHA_TESTING_SITE_KEY, 'secret_key' => self::RECAPTCHA_TESTING_SECRET_KEY]);
-
         $this->eventDispatcher = $this->getMockBuilder(EventDispatcherInterface::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -63,12 +44,12 @@ class IntegrationTest extends TestCase
             ->willReturn(true);
 
 
-        $this->integrationHelper = $this->getMockBuilder(IntegrationHelper::class)
+        $this->integrationsHelper = $this->getMockBuilder(IntegrationsHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->integrationHelper
-            ->method('getIntegrationObject')
+        $this->integrationsHelper
+            ->method('getIntegration')
             ->willReturn($this->integration);
     }
 
@@ -101,8 +82,8 @@ class IntegrationTest extends TestCase
 
         $formSubscriber = new FormSubscriber(
             $this->eventDispatcher,
-            $this->integrationHelper,
-            new RecaptchaClient($this->integrationHelper),
+            $this->integrationsHelper,
+            new RecaptchaClient($this->integrationsHelper),
             $leadModel,
             $translator
         );

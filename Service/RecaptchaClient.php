@@ -53,7 +53,7 @@ class RecaptchaClient
     {
         if(empty($token)) {
             // @todo use logger service
-            error_log('Recaptcha: Token is empty');
+            error_log('Recaptcha: Frontend token is empty');
             return false;
         }
         

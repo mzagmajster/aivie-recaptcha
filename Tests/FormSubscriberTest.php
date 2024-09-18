@@ -8,11 +8,10 @@
 
 namespace MauticPlugin\MauticRecaptchaBundle\Tests;
 
-use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Event\ValidationEvent;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
 use MauticPlugin\MauticRecaptchaBundle\EventListener\FormSubscriber;
 use MauticPlugin\MauticRecaptchaBundle\Integration\RecaptchaIntegration;
 use MauticPlugin\MauticRecaptchaBundle\Service\RecaptchaClient;
@@ -21,6 +20,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Mautic\FormBundle\Event\FormBuilderEvent;
+use Mautic\PluginBundle\Entity\Integration;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class FormSubscriberTest extends TestCase
@@ -36,9 +36,9 @@ class FormSubscriberTest extends TestCase
     private $eventDispatcher;
 
     /**
-     * @var MockObject|IntegrationHelper
+     * @var MockObject|IntegrationsHelper
      */
-    private $integrationHelper;
+    private $integrationsHelper;
 
     /**
      * @var MockObject|LeadModel
@@ -71,7 +71,7 @@ class FormSubscriberTest extends TestCase
 
         $this->integration       = $this->createMock(RecaptchaIntegration::class);
         $this->eventDispatcher   = $this->createMock(EventDispatcherInterface::class);
-        $this->integrationHelper = $this->createMock(IntegrationHelper::class);
+        $this->integrationsHelper = $this->createMock(IntegrationsHelper::class);
         $this->leadModel         = $this->createMock(LeadModel::class);
         $this->recaptchaClient   = $this->createMock(RecaptchaClient::class);
         $this->translator        = $this->createMock(TranslatorInterface::class);
@@ -82,10 +82,6 @@ class FormSubscriberTest extends TestCase
             ->method('addListener')
             ->willReturn(true);
 
-        $this->integration
-            ->method('getKeys')
-            ->willReturn(['site_key' => 'test', 'secret_key' => 'test']);
-
         $this->validationEvent
             ->method('getValue')
             ->willReturn('test');
@@ -93,6 +89,12 @@ class FormSubscriberTest extends TestCase
         $this->validationEvent
             ->method('getField')
             ->willReturn(new Field());
+
+        $integration = new Integration();
+        $integration->setIsPublished(true);
+
+        $this->integration->method('getIntegrationConfiguration')
+            ->willReturn($integration);
     }
 
     public function testOnFormValidateSuccessful()
@@ -101,8 +103,8 @@ class FormSubscriberTest extends TestCase
             ->method('verify')
             ->willReturn(true);
 
-        $this->integrationHelper->expects($this->once())
-            ->method('getIntegrationObject')
+        $this->integrationsHelper->expects($this->once())
+            ->method('getIntegration')
             ->willReturn($this->integration);
 
         $this->createFormSubscriber()->onFormValidate($this->validationEvent);
@@ -118,8 +120,8 @@ class FormSubscriberTest extends TestCase
             ->method('getValue')
             ->willReturn('any-value-should-work');
 
-        $this->integrationHelper->expects($this->once())
-            ->method('getIntegrationObject')
+        $this->integrationsHelper->expects($this->once())
+            ->method('getIntegration')
             ->willReturn($this->integration);
 
         $this->createFormSubscriber()->onFormValidate($this->validationEvent);
@@ -130,21 +132,9 @@ class FormSubscriberTest extends TestCase
         $this->recaptchaClient->expects($this->never())
             ->method('verify');
 
-        $this->integrationHelper->expects($this->once())
-            ->method('getIntegrationObject')
+        $this->integrationsHelper->expects($this->once())
+            ->method('getIntegration')
             ->willReturn(null);
-
-        $this->createFormSubscriber()->onFormValidate($this->validationEvent);
-    }
-
-    public function testOnFormValidateWhenPluginIsNotConfigured()
-    {
-        $this->recaptchaClient->expects($this->never())
-            ->method('verify');
-
-        $this->integrationHelper->expects($this->once())
-            ->method('getIntegrationObject')
-            ->willReturn(['site_key' => '']);
 
         $this->createFormSubscriber()->onFormValidate($this->validationEvent);
     }
@@ -159,8 +149,8 @@ class FormSubscriberTest extends TestCase
             ->method('addValidator')
             ->with('plugin.recaptcha.validator');
 
-        $this->integrationHelper->expects($this->once())
-            ->method('getIntegrationObject')
+        $this->integrationsHelper->expects($this->once())
+            ->method('getIntegration')
             ->willReturn($this->integration);
 
         $this->createFormSubscriber()->onFormBuild($this->formBuildEvent);
@@ -171,21 +161,9 @@ class FormSubscriberTest extends TestCase
         $this->formBuildEvent->expects($this->never())
             ->method('addFormField');
 
-        $this->integrationHelper->expects($this->once())
-            ->method('getIntegrationObject')
+        $this->integrationsHelper->expects($this->once())
+            ->method('getIntegration')
             ->willReturn(null);
-
-        $this->createFormSubscriber()->onFormBuild($this->formBuildEvent);
-    }
-
-    public function testOnFormBuildWhenPluginIsNotConfigured()
-    {
-        $this->formBuildEvent->expects($this->never())
-            ->method('addFormField');
-
-        $this->integrationHelper->expects($this->once())
-            ->method('getIntegrationObject')
-            ->willReturn(['site_key' => '']);
 
         $this->createFormSubscriber()->onFormBuild($this->formBuildEvent);
     }
@@ -197,7 +175,7 @@ class FormSubscriberTest extends TestCase
     {
         return new FormSubscriber(
             $this->eventDispatcher,
-            $this->integrationHelper,
+            $this->integrationsHelper,
             $this->recaptchaClient,
             $this->leadModel,
             $this->translator

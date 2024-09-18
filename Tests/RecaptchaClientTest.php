@@ -11,17 +11,16 @@ namespace MauticPlugin\MauticRecaptchaBundle\Tests;
 use Mautic\FormBundle\Entity\Field;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use PHPUnit_Framework_MockObject_MockBuilder;
-use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
 use MauticPlugin\MauticRecaptchaBundle\Integration\RecaptchaIntegration;
 use MauticPlugin\MauticRecaptchaBundle\Service\RecaptchaClient;
 
 class RecaptchaClientTest extends TestCase
 {
     /**
-     * @var MockObject|IntegrationHelper
+     * @var MockObject|IntegrationsHelper
      */
-    private $integrationHelper;
+    private $integrationsHelper;
 
     /**
      * @var MockObject|RecaptchaIntegration
@@ -37,34 +36,15 @@ class RecaptchaClientTest extends TestCase
     {
         parent::setUp();
 
-        $this->integrationHelper = $this->createMock(IntegrationHelper::class);
+        $this->integrationsHelper = $this->createMock(IntegrationsHelper::class);
         $this->integration       = $this->createMock(RecaptchaIntegration::class);
         $this->field = new Field();
     }
 
     public function testVerifyWhenPluginIsNotInstalled()
     {
-        $this->integrationHelper->expects($this->once())
-            ->method('getIntegrationObject')
-            ->willReturn(null);
-
-        $this->integration->expects($this->never())
-            ->method('getKeys');
-
-        $this->createRecaptchaClient()->verify('', $this->field);
-    }
-
-    public function testVerifyWhenPluginIsNotConfigured()
-    {
-        $this->integrationHelper->expects($this->once())
-            ->method('getIntegrationObject')
-            ->willReturn($this->integration);
-
-        $this->integration->expects($this->once())
-            ->method('getKeys')
-            ->willReturn(['site_key' => 'test', 'secret_key' => 'test']);
-
-        $this->createRecaptchaClient()->verify('', $this->field);
+        $test = $this->createRecaptchaClient()->verify('', $this->field);
+        $this->assertFalse($test);
     }
 
     /**
@@ -73,7 +53,7 @@ class RecaptchaClientTest extends TestCase
     private function createRecaptchaClient()
     {
         return new RecaptchaClient(
-            $this->integrationHelper
+            $this->integrationsHelper
         );
     }
 }

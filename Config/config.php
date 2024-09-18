@@ -1,8 +1,7 @@
 <?php
 
 /*
- * @copyright   2018 Konstantin Scheumann. All rights reserved
- * @author      Konstantin Scheumann
+ * @author      Adrian Schimpf (based on Konstantin Scheumann's work)
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -10,33 +9,27 @@ return [
     'name'        => 'reCAPTCHA',
     'description' => 'Enables reCAPTCHA integration.',
     'version'     => '1.0',
-    'author'      => 'Konstantin Scheumann',
-
-    'routes' => [
-
-    ],
-
+    'author'      => 'Adrian Schimpf',
+    'routes' => [],
     'services' => [
         'events' => [
             'mautic.recaptcha.event_listener.form_subscriber' => [
                 'class'     => \MauticPlugin\MauticRecaptchaBundle\EventListener\FormSubscriber::class,
                 'arguments' => [
                     'event_dispatcher',
-                    'mautic.helper.integration',
+                    'mautic.integrations.helper',
                     'mautic.recaptcha.service.recaptcha_client',
                     'mautic.lead.model.lead',
                     'translator'
                 ],
             ],
         ],
-        'models' => [
-
-        ],
+        'models' => [],
         'others'=>[
             'mautic.recaptcha.service.recaptcha_client' => [
                 'class'     => \MauticPlugin\MauticRecaptchaBundle\Service\RecaptchaClient::class,
                 'arguments' => [
-                    'mautic.helper.integration',
+                    'mautic.integrations.helper',
                 ],
             ],
         ],
@@ -61,10 +54,11 @@ return [
                     'mautic.plugin.model.integration_entity',
                     'mautic.lead.model.dnc',
                 ],
+                'tags'      => [
+                    'mautic.basic_integration',
+                ],
             ],
         ],
     ],
-    'parameters' => [
-
-    ],
+    'parameters' => [],
 ];

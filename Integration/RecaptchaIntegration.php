@@ -8,24 +8,27 @@
 
 namespace MauticPlugin\MauticRecaptchaBundle\Integration;
 
-use Mautic\PluginBundle\Integration\AbstractIntegration;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Form;
-use Symfony\Component\Form\FormBuilder;
+use Mautic\IntegrationsBundle\Integration\BasicIntegration;
+use Mautic\IntegrationsBundle\Integration\Interfaces\BasicInterface;
 
 /**
  * Class RecaptchaIntegration.
  */
-class RecaptchaIntegration extends AbstractIntegration
+class RecaptchaIntegration  extends BasicIntegration implements BasicInterface
 {
     const INTEGRATION_NAME = 'Recaptcha';
 
-    public function getName()
+    public function getName(): string
     {
         return self::INTEGRATION_NAME;
     }
 
-    public function getDisplayName()
+    public function getIcon(): string
+    {
+        return 'plugins/MauticRecaptchaBundle/Assets/img/recaptcha.png';
+    }
+
+    public function getDisplayName(): string
     {
         return 'reCAPTCHA';
     }

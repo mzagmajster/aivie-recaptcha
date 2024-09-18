@@ -58,11 +58,6 @@ class FormSubscriber implements EventSubscriberInterface
     private $translator;
 
     /**
-     * @var string|null
-     */
-    private $version;
-
-    /**
      * @param EventDispatcherInterface $eventDispatcher
      * @param IntegrationHelper        $integrationHelper
      * @param RecaptchaClient          $recaptchaClient
@@ -82,7 +77,6 @@ class FormSubscriber implements EventSubscriberInterface
         
         if ($integration && $integration->getIntegrationSettings()->getIsPublished()) {
             
-            $this->version   = $integration->getKeys()['version'] ?? 'v3';
             $this->siteKey   = getenv('GC_RECAPTCHA_SITE_KEY');
 
             if ($this->siteKey) {
@@ -128,7 +122,6 @@ class FormSubscriber implements EventSubscriberInterface
                 'addSaveResult'    => true,
             ],
             'site_key' => $this->siteKey,
-            'version'  => $this->version,
             'tagAction'=> $this->recaptchaClient->getTagActionName(),
         ]);
 

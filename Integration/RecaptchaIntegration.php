@@ -39,33 +39,4 @@ class RecaptchaIntegration extends AbstractIntegration
     {
         return [];
     }
-
-    /**
-     * @param FormBuilder|Form $builder
-     * @param array            $data
-     * @param string           $formArea
-     */
-    public function appendToForm(&$builder, $data, $formArea)
-    {
-        if ($formArea === 'keys') {
-            $builder->add(
-                'version',
-                ChoiceType::class,
-                [
-                    'choices' => [
-                        'mautic.recaptcha.v2' => 'v2',
-                        'mautic.recaptcha.v3' => 'v3',
-                    ],
-                    'label'      => 'mautic.recaptcha.version',
-                    'label_attr' => ['class' => 'control-label'],
-                    'attr'       => [
-                        'class'    => 'form-control',
-                    ],
-                    'required'    => false,
-                    'placeholder' => false,
-                    'data'=> isset($data['version']) ? $data['version'] : 'v2'
-                ]
-            );
-        }
-    }
 }

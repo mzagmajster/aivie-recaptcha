@@ -53,7 +53,7 @@ class RecaptchaClient
     {
         if(empty($token)) {
             // @todo use logger service
-            error_log('RC: Token is empty');
+            error_log('Recaptcha: Token is empty');
             return false;
         }
         
@@ -61,10 +61,10 @@ class RecaptchaClient
 
         $minScore = (float)  ArrayHelper::getValue('minScore', $field->getProperties());
         if ($riskScore > 0 && $minScore <= $riskScore) {
-            error_log('RC: valid - minimum score ('.$minScore.') is met: '.$riskScore);
+            error_log('Recaptcha: valid - minimum score ('.$minScore.') is met: '.$riskScore);
             return true;
         }
-        error_log('RC: risky - minimum score ('.$minScore.') is NOT met: '.$riskScore);
+        error_log('Recaptcha: risky - minimum score ('.$minScore.') is NOT met: '.$riskScore);
         return false;
     }
 
@@ -98,7 +98,7 @@ class RecaptchaClient
     
             if ($response->getTokenProperties()->getValid() == false) {
                 $message =sprintf(
-                    'RC: CreateAssessment() failed: because the token was invalid. Reason: %s',
+                    'Recaptcha: CreateAssessment() failed: because the token was invalid. Reason: %s',
                     InvalidReason::name($response->getTokenProperties()->getInvalidReason())
                 );
 
@@ -108,13 +108,13 @@ class RecaptchaClient
     
             $tagAction = $response->getTokenProperties()->getAction();
             if ($tagAction == $action) {
-                error_log('RC: The score is:'.$response->getRiskAnalysis()->getScore());
+                error_log('Recaptcha: The score is:'.$response->getRiskAnalysis()->getScore());
                 return $response->getRiskAnalysis()->getScore();
             } else {
-                $message = "RC: The action attribute in your reCAPTCHA tag ($tagAction) does not match the action you are expecting to score ($action)";
+                $message = "Recaptcha: The action attribute in your reCAPTCHA tag ($tagAction) does not match the action you are expecting to score ($action)";
             }
         } catch (\Exception $e) {
-            $message = "RC: CreateAssessment() call failed with the following error: ".$e->getMessage();
+            $message = "Recaptcha: CreateAssessment() call failed with the following error: ".$e->getMessage();
             error_log($e);
         }
         error_log($message);

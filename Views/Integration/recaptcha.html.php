@@ -40,27 +40,16 @@ $jsElement = <<<JSELEMENT
 </script>
 JSELEMENT;
 
-if($field['customParameters']['version'] == 'v2') {
-$jsElement .= <<<JSELEMENT
-<script src='https://www.google.com/recaptcha/api.js' async></script>
-JSELEMENT;
-} else {
+
 $jsElement .= <<<JSELEMENT
 <script src='https://www.google.com/recaptcha/api.js?onload=onLoad{$hashedFormName}&render={$field['customParameters']['site_key']}' async></script>
 JSELEMENT;
-}
 
 $html = <<<HTML
     {$jsElement}
 	<div $containerAttr>
         {$label}
 HTML;
-
-if($field['customParameters']['version'] == 'v2') {
-$html .= <<<HTML
-<div class="g-recaptcha" data-sitekey="{$field['customParameters']['site_key']}" data-callback="verifyCallback_{$hashedFormName}"></div>
-HTML;
-}
 
 $html .= <<<HTML
         <input $inputAttr type="hidden">

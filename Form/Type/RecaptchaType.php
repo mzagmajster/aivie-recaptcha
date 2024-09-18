@@ -25,19 +25,6 @@ class RecaptchaType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-
-        $builder->add(
-            'scoreValidation',
-            YesNoButtonGroupType::class,
-            [
-                'label'      => 'mautic.recaptcha.score.validation',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'tooltip' => 'mautic.recaptcha.min.score.tooltip',
-                ],
-                'data'       => isset($options['data']['scoreValidation']) ? $options['data']['scoreValidation'] : false,
-            ]
-        );
         $builder->add(
             'minScore',
             NumberType::class,
@@ -46,7 +33,7 @@ class RecaptchaType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr' => [
                     'class' => 'form-control',
-                    'data-show-on' => '{"formfield_properties_scoreValidation_1":"checked"}'
+                    'tooltip' => 'mautic.recaptcha.min.score.tooltip',
                 ],
                 'data'       => isset($options['data']['minScore']) ? (float) $options['data']['minScore'] : 0.8,
             ]

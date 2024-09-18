@@ -26,8 +26,6 @@ Set the following ENV variables:
 - GC_RECAPTCHA_SITE_KEY
 - GOOGLE_APPLICATION_CREDENTIALS [Details](https://cloud.google.com/docs/authentication/application-default-credentials#GAC)
 
-![plugin config](/doc/config.png?raw=true "plugin config")
-
 ## Usage in Mautic Form
 Add "reCAPTCHA" field to the Form and save changes.
 ![mautic form](/doc/form_preview.png?raw=true "Mautic Form with reCAPTCHA")

@@ -59,9 +59,8 @@ class RecaptchaClient
         
         $riskScore = $this->createAssessment($this->siteKey, $token, $this->project, $this->getTagActionName());
 
-        $scoreValidation = ArrayHelper::getValue('scoreValidation', $field->getProperties());
         $minScore = (float)  ArrayHelper::getValue('minScore', $field->getProperties());
-        if ($riskScore > 0 && $scoreValidation && $minScore <= $riskScore) {
+        if ($riskScore > 0 && $minScore <= $riskScore) {
             error_log('RC: valid - minimum score ('.$minScore.') is met: '.$riskScore);
             return true;
         }

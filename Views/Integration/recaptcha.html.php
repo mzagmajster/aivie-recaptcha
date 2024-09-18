@@ -28,12 +28,12 @@ $label = (!$field['showLabel'])
 HTML;
 
 $jsElement = <<<JSELEMENT
-	<script type="text/javascript">
+	<script type="text/javascript" async>
     function verifyCallback_{$hashedFormName}( response ) {
         document.getElementById("mauticform_input_{$formName}_{$field['alias']}").value = response;
     }
     function onLoad{$hashedFormName}() { 
-        grecaptcha.execute('{$field['customParameters']['site_key']}', {action: 'form'}).then(function(token) {
+        grecaptcha.execute('{$field['customParameters']['site_key']}', {action: '{$field['customParameters']['tagAction']}'}).then(function(token) {
             verifyCallback_{$hashedFormName}(token);
          }); 
     }
@@ -42,11 +42,11 @@ JSELEMENT;
 
 if($field['customParameters']['version'] == 'v2') {
 $jsElement .= <<<JSELEMENT
-<script src='https://www.google.com/recaptcha/api.js'></script>
+<script src='https://www.google.com/recaptcha/api.js' async></script>
 JSELEMENT;
 } else {
 $jsElement .= <<<JSELEMENT
-<script src='https://www.google.com/recaptcha/api.js?onload=onLoad{$hashedFormName}&render={$field['customParameters']['site_key']}'></script>
+<script src='https://www.google.com/recaptcha/api.js?onload=onLoad{$hashedFormName}&render={$field['customParameters']['site_key']}' async></script>
 JSELEMENT;
 }
 

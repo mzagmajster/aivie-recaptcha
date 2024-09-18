@@ -1,93 +1,124 @@
 <?php
 
 /*
- * @copyright   2018 Konstantin Scheumann. All rights reserved
- * @author      Konstantin Scheumann
+ * @copyright   2024 Aivie. All rights reserved
+ * @author      Adrian Schimpf
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace MauticPlugin\MauticRecaptchaBundle\Service;
 
-use GuzzleHttp\Client as GuzzleClient;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\FormBundle\Entity\Field;
-use Mautic\PluginBundle\Helper\IntegrationHelper;
-use MauticPlugin\MauticRecaptchaBundle\Integration\RecaptchaIntegration;
-use Mautic\PluginBundle\Integration\AbstractIntegration;
+use Google\Cloud\RecaptchaEnterprise\V1\RecaptchaEnterpriseServiceClient;
+use Google\Cloud\RecaptchaEnterprise\V1\Event;
+use Google\Cloud\RecaptchaEnterprise\V1\Assessment;
+use Google\Cloud\RecaptchaEnterprise\V1\TokenProperties\InvalidReason;
 
 class RecaptchaClient
 {
-    const VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify';
+    public const TAG_NAME = 'form';
+
+    private string $siteKey;
 
     /**
-     * @var string
+     * the Google cloud project id
      */
-    protected $siteKey;
+    private string $project;
 
-    /**
-     * @var string
-     */
-    protected $secretKey;
 
     /**
      * FormSubscriber constructor.
-     *
-     * @param IntegrationHelper $integrationHelper
      */
-    public function __construct(IntegrationHelper $integrationHelper)
+    public function __construct()
     {
-        $integrationObject = $integrationHelper->getIntegrationObject(RecaptchaIntegration::INTEGRATION_NAME);
-
-        if ($integrationObject instanceof AbstractIntegration) {
-            $keys            = $integrationObject->getKeys();
-            $this->siteKey   = isset($keys['site_key']) ? $keys['site_key'] : null;
-            $this->secretKey = isset($keys['secret_key']) ? $keys['secret_key'] : null;
-        }
+        $this->siteKey   = getenv('GC_RECAPTCHA_SITE_KEY');
+        $this->project   = getenv('GOOGLE_CLOUD_PROJECT');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [];
     }
 
+    public function getTagActionName(): string
+    {
+        return self::TAG_NAME;
+    }
 
     /**
-     * @param string $response
-     * @param Field  $field
-     *
-     * @return bool
+     * Check if a form submission is estimated to be from a bot.
      */
-    public function verify($response, Field $field)
+    public function verify( string $token, Field $field): bool
     {
-        $client   = new GuzzleClient(['timeout' => 10]);
-        $response = $client->post(
-            self::VERIFY_URL,
-            [
-                'form_params' => [
-                    'secret'   => $this->secretKey,
-                    'response' => $response,
-                ],
-            ]
-        );
+        if(empty($token)) {
+            // @todo use logger service
+            error_log('RC: Token is empty');
+            return false;
+        }
+        
+        $riskScore = $this->createAssessment($this->siteKey, $token, $this->project, $this->getTagActionName());
 
-
-        $response = json_decode($response->getBody(), true);
-        if (array_key_exists('success', $response) && $response['success'] === true) {
-
-            $score = (float) ArrayHelper::getValue('score', $response);
-            $scoreValidation = ArrayHelper::getValue('scoreValidation', $field->getProperties());
-            $minScore = (float)  ArrayHelper::getValue('minScore', $field->getProperties());
-            if ($score && $scoreValidation && $minScore > $score) {
-                return false;
-            }
-
+        $scoreValidation = ArrayHelper::getValue('scoreValidation', $field->getProperties());
+        $minScore = (float)  ArrayHelper::getValue('minScore', $field->getProperties());
+        if ($riskScore > 0 && $scoreValidation && $minScore <= $riskScore) {
+            error_log('RC: valid - minimum score ('.$minScore.') is met: '.$riskScore);
             return true;
         }
-
-
+        error_log('RC: risky - minimum score ('.$minScore.') is NOT met: '.$riskScore);
         return false;
+    }
+
+    /**
+     * Gets the score based on the reCAPTCHA token.
+     *
+     * @param string $recaptchaKey reCAPTCHA key from Google cloud console.
+     * @param string $token        token from the frontend (recaptcha.html.php).
+     * @param string $project      Google Cloud-Projekt-ID.
+     * @param string $action       Corresponds with the $token set in recaptcha.html.php. E.g. submit or login
+     */
+    private function createAssessment(
+        string $recaptchaKey,
+        string $token,
+        string $project,
+        string $action
+    ): float {
+
+        $client = new RecaptchaEnterpriseServiceClient();
+        $projectName = $client->projectName($project);
+    
+        $event = (new Event())->setSiteKey($recaptchaKey)->setToken($token);
+    
+        $assessment = (new Assessment())->setEvent($event);
+    
+        try {
+            $response = $client->createAssessment(
+                $projectName,
+                $assessment
+            );
+    
+            if ($response->getTokenProperties()->getValid() == false) {
+                $message =sprintf(
+                    'RC: CreateAssessment() failed: because the token was invalid. Reason: %s',
+                    InvalidReason::name($response->getTokenProperties()->getInvalidReason())
+                );
+
+                error_log($message);
+                return 0;
+            }
+    
+            $tagAction = $response->getTokenProperties()->getAction();
+            if ($tagAction == $action) {
+                error_log('RC: The score is:'.$response->getRiskAnalysis()->getScore());
+                return $response->getRiskAnalysis()->getScore();
+            } else {
+                $message = "RC: The action attribute in your reCAPTCHA tag ($tagAction) does not match the action you are expecting to score ($action)";
+            }
+        } catch (\Exception $e) {
+            $message = "RC: CreateAssessment() call failed with the following error: ".$e->getMessage();
+            error_log($e);
+        }
+        error_log($message);
+        return 0;
     }
 }

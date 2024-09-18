@@ -39,16 +39,8 @@ class FormSubscriber implements EventSubscriberInterface
      * @var RecaptchaClient
      */
     protected $recaptchaClient;
-
-    /**
-     * @var string
-     */
     protected $siteKey;
 
-    /**
-     * @var string
-     */
-    protected $secretKey;
 
     /**
      * @var boolean
@@ -86,16 +78,17 @@ class FormSubscriber implements EventSubscriberInterface
     ) {
         $this->eventDispatcher = $eventDispatcher;
         $this->recaptchaClient = $recaptchaClient;
-        $integrationObject     = $integrationHelper->getIntegrationObject(RecaptchaIntegration::INTEGRATION_NAME);
+        $integration     = $integrationHelper->getIntegrationObject(RecaptchaIntegration::INTEGRATION_NAME);
         
-        if ($integrationObject instanceof AbstractIntegration) {
-            $keys            = $integrationObject->getKeys();
-            $this->siteKey   = isset($keys['site_key']) ? $keys['site_key'] : null;
-            $this->secretKey = isset($keys['secret_key']) ? $keys['secret_key'] : null;
-            $this->version   = isset($keys['version']) ? $keys['version'] : null;
+        if ($integration && $integration->getIntegrationSettings()->getIsPublished()) {
+            
+            $this->version   = $integration->getKeys()['version'] ?? 'v3';
+            $this->siteKey   = getenv('GC_RECAPTCHA_SITE_KEY');
 
-            if ($this->siteKey && $this->secretKey) {
+            if ($this->siteKey) {
                 $this->recaptchaIsConfigured = true;
+            }else{
+                error_log('Recaptcha is not configured properly - check your ENV variables');
             }
         }
         $this->leadModel = $leadModel;
@@ -136,6 +129,7 @@ class FormSubscriber implements EventSubscriberInterface
             ],
             'site_key' => $this->siteKey,
             'version'  => $this->version,
+            'tagAction'=> $this->recaptchaClient->getTagActionName(),
         ]);
 
         $event->addValidator('plugin.recaptcha.validator', [

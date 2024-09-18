@@ -1,15 +1,15 @@
 {
-    "name": "koco/mautic-recaptcha-bundle",
-    "description": "This plugin brings reCAPTCHA integration to mautic.",
+    "name": "aiviemarketing/mautic-recaptcha",
+    "description": "This plugin brings reCAPTCHA integration to Aivie and mautic.",
     "type": "mautic-plugin",
-    "require": {
-        "mautic/composer-plugin": "^1.0"
-    },
     "license": "GPL-3.0-only",
     "authors": [
         {
-            "name": "Konstantin Scheumann",
-            "email": "info@konstantin.codes"
+            "name": "Adrian Schimpf",
+            "email": "dev@aivie.ch"
         }
-    ]
+    ],
+    "require": {
+        "google/cloud-recaptcha-enterprise": "^1.15"
+    }
 }

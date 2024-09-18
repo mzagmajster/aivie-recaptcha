@@ -37,10 +37,7 @@ class RecaptchaIntegration extends AbstractIntegration
 
     public function getRequiredKeyFields()
     {
-        return [
-            'site_key'   => 'mautic.integration.recaptcha.site_key',
-            'secret_key' => 'mautic.integration.recaptcha.secret_key',
-        ];
+        return [];
     }
 
     /**

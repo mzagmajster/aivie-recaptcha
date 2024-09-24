@@ -8,19 +8,21 @@
  * @param {string} tagAction reCAPTCHA tag action
  * @link https://cloud.google.com/recaptcha/docs/create-assessment-website
  */
-function getTokenAndValidateRecaptcha(event, siteKey, tagAction) {
-    event.preventDefault();
+function getTokenAndValidateRecaptcha(formId, siteKey, tagAction) {
+    const recaptchaTokenClass = 'mautic-recaptcha-token';
+    const form = document.getElementById(formId);
+    if (!form) {
+        throw new Error(`Form with id '${formId}' not found`);
+    }
+    inputElement = form.querySelector(`input.${recaptchaTokenClass}`);
+    if (!inputElement) {
+        throw new Error(`No input element found with class '${recaptchaTokenClass}'`);
+    }
     grecaptcha.enterprise.ready(async () => {
         const token = await grecaptcha.enterprise.execute(siteKey, { action: tagAction });
-        const form = event.target;
-        inputElement = form.querySelector('input.mautic-recaptcha-token');
 
-        if (!inputElement) {
-            throw new Error("No input element found with class 'mautic-recaptcha-token'");
-        }
         inputElement.value = token;
-        console.debug('Recaptcha: Token received and added to form field. Sending form now.');
-        form.submit();
+        console.debug('Recaptcha: Token received and added to form field. Refreshing token in 110 seconds.');
     });
 }
 
@@ -31,43 +33,20 @@ function getTokenAndValidateRecaptcha(event, siteKey, tagAction) {
  * @param {string} tagAction reCAPTCHA tag action
  */
 function validateFormByRecaptcha(formId, siteKey, tagAction) {
-
-    const form = document.getElementById(formId);
-    if (!form) {
-        throw new Error(`Form with id '${formId}' not found`);
-    }
-
-    form.addEventListener('submit', function (event) {
-        // add the getting a token to the end of the validation queue
-        setTimeout(function () {
-            if (!checkIfFormIsValid(form)) {
-                console.debug('Recaptcha: Aborting, form not valid');
-                return false;
-            }
-            getTokenAndValidateRecaptcha(event, siteKey, tagAction);
-        }, 0);
-    });
-};
-
-/**
- * Workaround as we don't use HTML 5 validation.
- * We check if any child has the 'mauticform-errormsg' class and is visible.
- * 
- * @param {HTMLFormElement} form 
- * @returns boolean
- */
-function checkIfFormIsValid(form) {
-
-    let hasErrorMsg = false;
-
-    // Go through all child elements
-    form.querySelectorAll('*').forEach(function (child) {
-        if (child.classList.contains('mauticform-errormsg')) {
-            if (child.style.display !== 'none') {
-                hasErrorMsg = true;
-            }
+    
+    getTokenAndValidateRecaptcha(formId, siteKey, tagAction);
+    // This code sets up a recurring function call using setInterval.
+    // Every 110 seconds, the function getTokenAndValidateRecaptcha
+    // is called with the arguments event, siteKey, and tagAction.
+    const startTime = Date.now();
+    const intervalId = setInterval(function () {
+        const elapsedTime = Date.now() - startTime;
+        if (elapsedTime >= 3600000) { // 1 hour in milliseconds = 3600000
+            clearInterval(intervalId);
+            console.debug('Recaptcha: Interval cleared after 1 hour.');
+            return;
         }
-    });
+        getTokenAndValidateRecaptcha(formId, siteKey, tagAction);
+    }, 110000);
 
-    return !hasErrorMsg;
-}
+};

@@ -118,7 +118,7 @@ class FormSubscriber implements EventSubscriberInterface
                 'addDefaultValue'  => false,
                 'addSaveResult'    => true,
             ],
-            'site_key' => $this->siteKey,
+            'siteKey' => $this->siteKey,
             'tagAction'=> $this->recaptchaClient->getTagActionName(),
         ]);
 

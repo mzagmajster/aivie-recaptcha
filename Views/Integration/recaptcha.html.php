@@ -1,15 +1,16 @@
 <?php
-
-$defaultInputClass = (isset($inputClass)) ? $inputClass : 'input';
+$defaultInputClass = 'input, mautic-recaptcha-token';
 $containerType     = 'div-wrapper';
-
 include __DIR__.'/../../../../app/bundles/FormBundle/Views/Field/field_helper.php';
 
+$locale    = substr($app->getRequest()->getLocale(), 0, 2);
+$js        = $view['assets']->getUrl('plugins/MauticRecaptchaBundle/Views/Public/js/get-token.js');
+$siteKey   = $field['customParameters']['siteKey'];
+$tagAction = $field['customParameters']['tagAction'];
 $action   = $app->getRequest()->get('objectAction');
 $settings = $field['properties'];
-
 $formName    = str_replace('_', '', $formName);
-$hashedFormName = md5($formName);
+
 $formButtons = (!empty($inForm)) ? $view->render(
     'MauticFormBundle:Builder:actions.html.php',
     [
@@ -27,26 +28,14 @@ $label = (!$field['showLabel'])
 <label $labelAttr>{$view->escape($field['label'])}</label>
 HTML;
 
-$jsElement = <<<JSELEMENT
-	<script type="text/javascript" async>
-    function verifyCallback_{$hashedFormName}( response ) {
-        document.getElementById("mauticform_input_{$formName}_{$field['alias']}").value = response;
-    }
-    function onLoad{$hashedFormName}() { 
-        grecaptcha.execute('{$field['customParameters']['site_key']}', {action: '{$field['customParameters']['tagAction']}'}).then(function(token) {
-            verifyCallback_{$hashedFormName}(token);
-         }); 
-    }
-</script>
-JSELEMENT;
-
-
-$jsElement .= <<<JSELEMENT
-<script src='https://www.google.com/recaptcha/api.js?onload=onLoad{$hashedFormName}&render={$field['customParameters']['site_key']}' async></script>
-JSELEMENT;
-
 $html = <<<HTML
-    {$jsElement}
+    <script src="https://www.google.com/recaptcha/enterprise.js?render={$siteKey}&hl={$locale}&badge=bottomright" async></script>
+    <script src="{$js}"></script>
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            validateFormByRecaptcha('mauticform_{$formName}', '{$siteKey}', '{$tagAction}');
+        });
+    </script>
 	<div $containerAttr>
         {$label}
 HTML;
@@ -56,11 +45,7 @@ $html .= <<<HTML
         <span class="mauticform-errormsg" style="display: none;"></span>
     </div>
 HTML;
-?>
 
-
-
-<?php
 echo $html;
 ?>
 

@@ -32,7 +32,7 @@ $html = <<<HTML
     <script src="https://www.google.com/recaptcha/enterprise.js?render={$siteKey}&hl={$locale}&badge=bottomright" async></script>
     <script src="{$js}"></script>
     <script type="text/javascript">
-        document.addEventListener('DOMContentLoaded', function() {
+        window.addEventListener('load', function() {
             validateFormByRecaptcha('mauticform_{$formName}', '{$siteKey}', '{$tagAction}');
         });
     </script>

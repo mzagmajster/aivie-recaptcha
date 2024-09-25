@@ -17,7 +17,7 @@ use Google\Cloud\RecaptchaEnterprise\V1\TokenProperties\InvalidReason;
 
 class RecaptchaClient
 {
-    public const TAG_NAME = 'form';
+    public const TAG_NAME = 'mautic-form';
 
     private string $siteKey;
 

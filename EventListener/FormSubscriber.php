@@ -21,7 +21,7 @@ use MauticPlugin\MauticRecaptchaBundle\RecaptchaEvents;
 use MauticPlugin\MauticRecaptchaBundle\Service\RecaptchaClient;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\CoreBundle\Translation\Translator;
 
 class FormSubscriber implements EventSubscriberInterface
 {
@@ -50,7 +50,7 @@ class FormSubscriber implements EventSubscriberInterface
     private $leadModel;
 
     /**
-     * @var TranslatorInterface
+     * @var Translator
      */
     private $translator;
 
@@ -59,14 +59,14 @@ class FormSubscriber implements EventSubscriberInterface
      * @param IntegrationHelper        $integrationHelper
      * @param RecaptchaClient          $recaptchaClient
      * @param LeadModel                $leadModel
-     * @param TranslatorInterface      $translator
+     * @param Translator      $translator
      */
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
         IntegrationsHelper $integrationsHelper,
         RecaptchaClient $recaptchaClient,
         LeadModel $leadModel,
-        TranslatorInterface $translator
+        Translator $translator
     ) {
         $this->eventDispatcher = $eventDispatcher;
         $this->recaptchaClient = $recaptchaClient;

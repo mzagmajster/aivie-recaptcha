@@ -1,0 +1,78 @@
+{#
+    This field relies on the `text.html.twig` implementation.
+
+    Mautic tries to render `@themes/{{theme}}/html/MauticFormBundle/Field/text.html.twig`
+    and falls back to the standard template '@MauticForm/Field/text.html.twig'.
+
+    This eliminates the need to copy twig templates into themes that just rely on one base template file.
+#}
+
+{% set formName = 'test1' %}
+{% set formId = app.request.get('objectId') %}
+{{- include([theme|default('') ~ 'text.html.twig', '@MauticForm/Field/text.html.twig'], {
+        'field': field,
+        'fields': fields|default([]),
+        'inForm': inForm|default(false),
+        'type': 'text',
+        'id': id,
+        'required': true,
+        'formId': formId|default(0),
+        'formName': formName|default(''),
+}) -}}
+
+{% set defaultInputClass = 'input, mautic-recaptcha-token' %}
+{% set containerType = 'div-wrapper' %}
+
+{% set locale = app.request.locale[:2] %}
+{% set js = asset('plugins/MauticRecaptchaBundle/Resources/views/Public/js/get-token.js') %}
+{% set siteKey = field.customParameters.siteKey %}
+{% set tagAction = field.customParameters.tagAction %}
+{% set action = app.request.get('objectAction') %}
+{% set settings = field.properties %}
+
+{% if inForm is defined and inForm %}
+    {% set formButtons = include('@MauticForm/Builder/_actions.html.twig', {
+        deleted: false,
+        id: id,
+        formId: formId,
+        formName: formName,
+        disallowDelete: false
+    }) %}
+{% else %}
+    {% set formButtons = '' %}
+{% endif %}
+
+{% set label %}
+    {% if field.showLabel %}
+        <label>{{ field.label|e }}</label>
+    {% endif %}
+{% endset %}
+
+<script 
+    src="https://www.google.com/recaptcha/enterprise.js?render={{ siteKey }}&hl={{ locale }}&badge=bottomright" 
+    async
+>
+</script>
+<script 
+    src="{{ js }}"
+>
+</script>
+<script 
+    type="text/javascript"
+>
+    window.addEventListener('load', function() {
+        validateFormByRecaptcha('mauticform_{{ formName }}', '{{ siteKey }}', '{{ tagAction }}');
+    });
+</script>
+<div>
+    {{ label|raw }}
+    <input 
+        type="hidden" 
+        class="{{ defaultInputClass }}"
+    >
+    <span 
+        class="mauticform-errormsg" 
+        style="display: none;"
+    >
+    </span>
+</div>

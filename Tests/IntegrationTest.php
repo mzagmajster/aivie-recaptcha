@@ -1,17 +1,11 @@
 <?php
 
-/*
- * @copyright   2018 Konstantin Scheumann. All rights reserved
- * @author      Konstantin Scheumann
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticRecaptchaBundle\Tests;
 
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Event\ValidationEvent;
-use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
+use Mautic\LeadBundle\Model\LeadModel;
 use MauticPlugin\MauticRecaptchaBundle\EventListener\FormSubscriber;
 use MauticPlugin\MauticRecaptchaBundle\Integration\RecaptchaIntegration;
 use MauticPlugin\MauticRecaptchaBundle\Service\RecaptchaClient;
@@ -42,7 +36,6 @@ class IntegrationTest extends TestCase
         $this->eventDispatcher
             ->method('addListener')
             ->willReturn(true);
-
 
         $this->integrationsHelper = $this->getMockBuilder(IntegrationsHelper::class)
             ->disableOriginalConstructor()

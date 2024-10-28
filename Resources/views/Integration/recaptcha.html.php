@@ -3,16 +3,16 @@ $defaultInputClass = 'input, mautic-recaptcha-token';
 $containerType     = 'div-wrapper';
 include __DIR__.'/../../../../app/bundles/FormBundle/Views/Field/field_helper.php';
 
-$locale    = substr($app->getRequest()->getLocale(), 0, 2);
-$js        = $view['assets']->getUrl('plugins/MauticRecaptchaBundle/Views/Public/js/get-token.js', null, null, true);
-$siteKey   = $field['customParameters']['siteKey'];
-$tagAction = $field['customParameters']['tagAction'];
-$action   = $app->getRequest()->get('objectAction');
-$settings = $field['properties'];
+$locale      = substr($app->getRequest()->getLocale(), 0, 2);
+$js          = $view['assets']->getUrl('plugins/MauticRecaptchaBundle/Views/Public/js/get-token.js', null, null, true);
+$siteKey     = $field['customParameters']['siteKey'];
+$tagAction   = $field['customParameters']['tagAction'];
+$action      = $app->getRequest()->get('objectAction');
+$settings    = $field['properties'];
 $formName    = str_replace('_', '', $formName);
 
 $formButtons = (!empty($inForm)) ? $view->render(
-    'MauticFormBundle:Builder:actions.html.php',
+    '@MauticForm:Builder:actions.html.php',
     [
         'deleted'        => false,
         'id'             => $id,

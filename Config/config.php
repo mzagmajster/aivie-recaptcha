@@ -1,34 +1,30 @@
 <?php
 
-/*
- * @author      Adrian Schimpf (based on Konstantin Scheumann's work)
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
 
 return [
     'name'        => 'reCAPTCHA',
     'description' => 'Enables reCAPTCHA integration.',
     'version'     => '1.0.1',
     'author'      => 'Adrian Schimpf',
-    'routes' => [],
-    'menu' => [],
-    'services' => [
+    'routes'      => [],
+    'menu'        => [],
+    'services'    => [
         'events' => [
             'mautic.recaptcha.event_listener.form_subscriber' => [
-                'class'     => \MauticPlugin\MauticRecaptchaBundle\EventListener\FormSubscriber::class,
+                'class'     => MauticPlugin\MauticRecaptchaBundle\EventListener\FormSubscriber::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.integrations.helper',
                     'mautic.recaptcha.service.recaptcha_client',
                     'mautic.lead.model.lead',
-                    'translator'
+                    'translator',
                 ],
             ],
         ],
         'models' => [],
-        'others'=>[
+        'others' => [
             'mautic.recaptcha.service.recaptcha_client' => [
-                'class'     => \MauticPlugin\MauticRecaptchaBundle\Service\RecaptchaClient::class,
+                'class'     => MauticPlugin\MauticRecaptchaBundle\Service\RecaptchaClient::class,
                 'arguments' => [
                     'mautic.integrations.helper',
                 ],
@@ -36,7 +32,7 @@ return [
         ],
         'integrations' => [
             'mautic.integration.recaptcha' => [
-                'class'     => \MauticPlugin\MauticRecaptchaBundle\Integration\RecaptchaIntegration::class,
+                'class'     => MauticPlugin\MauticRecaptchaBundle\Integration\RecaptchaIntegration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',
@@ -61,7 +57,7 @@ return [
             ],
             // Provides the form types to use for the configuration UI
             'mautic.integration.recaptcha.configuration' => [
-                'class'     => \MauticPlugin\MauticRecaptchaBundle\Integration\Support\ConfigSupport::class,
+                'class'     => MauticPlugin\MauticRecaptchaBundle\Integration\Support\ConfigSupport::class,
                 'arguments' => [],
                 'tags'      => [
                     'mautic.config_integration',

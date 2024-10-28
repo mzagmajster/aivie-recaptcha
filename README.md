@@ -4,21 +4,34 @@
 [![Packagist](https://img.shields.io/packagist/l/koco/mautic-recaptcha-bundle.svg)](LICENSE)
 [![mautic](https://img.shields.io/badge/mautic-3%20&%204-blue.svg)](https://www.mautic.org/mixin/recaptcha/)
 
-This Plugin brings reCAPTCHA integration to mautic 3 and 4.
+This Plugin brings reCAPTCHA integration to mautic 5.
 
 ## Installation
 
-### mautic 3 & 4
+### mautic 5
 Supports reCaptcha v3.
 
 Add this code to the plugins/ directory of your mautic installation.
 
-Execute `composer require google/cloud-recaptcha-enterprise` in the main directory of the mautic installation.
+Install Google cloud recaptcha package
+
+```
+composer require google/cloud-recaptcha-enterprise` # in the main directory of the mautic installation.
+```
+
+Put plugin in plugins directory
+```
+cd <mautic-root>/plugins
+git clone <url> MauticRecaptchaBundle
+# clear the cache rm -rf var/cache/dev/* var/cache/prod/*
+php bin/console mautic:plugins:reload --env=prod
+```
 
 > @todo needs to be moved to the plugins composer.json, when we support composer v2. So we can install the https://github.com/mautic/composer-plugin.
 
 
 ## Configuration
+
 Navigate to the Plugins page and click "Install/Upgrade Plugins". You should now see a "reCAPTCHA" plugin. Open it to enable it.
 
 Set the following ENV variables on your server:

@@ -102,10 +102,9 @@ class FormSubscriber implements EventSubscriberInterface
                 'addDefaultValue'  => false,
                 'addSaveResult'    => true,
             ],
-            'siteKey'   => $this->siteKey,
-            'tagAction' => $this->recaptchaClient->getTagActionName(),
-            'formName'  => '',
-            'formId'    => '',
+            'siteKey'     => $this->siteKey,
+            'tagAction'   => $this->recaptchaClient->getTagActionName(),
+            'jsTokenUrl'  => 'https://tf3captcha.ddev.site/plugins/MauticRecaptchaBundle/Assets/js/get-token.js',
         ]);
 
         $event->addValidator('plugin.recaptcha.validator', [

@@ -45,11 +45,10 @@
     {% else %}
         {% set mauticFormInputId = 'mauticform_input_' ~ formName ~ '_' ~ id %}
         
-        <script 
-            src="https://www.google.com/recaptcha/enterprise.js?render={{ siteKey }}&hl={{ locale }}&badge=bottomoright" 
+        <script src="https://www.google.com/recaptcha/enterprise.js?render={{ siteKey }}&hl={{ locale }}&badge=bottomright" 
             async 
-        >
-        </script>
+            defer
+        ></script>
         <script 
             src="{{ jsToken }}"
         >

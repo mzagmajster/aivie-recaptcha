@@ -60,7 +60,6 @@ class FormSubscriber implements EventSubscriberInterface
 
         if ($integration && $integration->getIntegrationConfiguration()->getIsPublished()) {
             $this->siteKey   = getenv('GC_RECAPTCHA_SITE_KEY');
-            // $this->siteKey = 'test123';
 
             if ($this->siteKey) {
                 $this->recaptchaIsConfigured = true;

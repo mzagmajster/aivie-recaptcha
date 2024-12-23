@@ -14,6 +14,7 @@
 {% set tagAction = field.customParameters.tagAction %}
 {% set locale = app.request.locale|slice(0, 2) %}
 {% set jsToken = getAssetUrl('plugins/MauticRecaptchaBundle/Assets/js/get-token.js', null, null, true) %}
+{% set captchaBadge = field.properties.badgePosition %}
 
 {% set containerType = type|default('div-wrapper') %}
 {% set defaultInputClass = inputClass|default('input mautic-recaptcha-token') %}
@@ -45,7 +46,7 @@
     {% else %}
         {% set mauticFormInputId = 'mauticform_input_' ~ formName ~ '_' ~ id %}
         
-        <script src="https://www.google.com/recaptcha/enterprise.js?render={{ siteKey }}&hl={{ locale }}&badge=bottomright" 
+        <script src="https://www.google.com/recaptcha/enterprise.js?render={{ siteKey }}&hl={{ locale }}&badge={{ captchaBadge }}" 
             async 
             defer
         ></script>

@@ -4,6 +4,7 @@ namespace MauticPlugin\MauticRecaptchaBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -32,6 +33,20 @@ class RecaptchaType extends AbstractType
             ]
         );
 
+        $builder
+            ->add('badgePosition',
+                ChoiceType::class,
+                [
+                    'choices' => [
+                        'mautic.recaptcha.badge.bright' => 'bottomright',
+                        'mautic.recaptcha.badge.bleft'  => 'bottomleft',
+                        'mautic.recaptcha.badge.inline' => 'inline',
+                    ],
+                    'label'    => 'mautic.recaptcha.badge.position',
+                    'required' => true,
+                    'data'     => $options['badgePosition'] ?? 'bottomright',
+                ]);
+
         $builder->add(
             'buttons',
             FormButtonsType::class,
@@ -56,7 +71,8 @@ class RecaptchaType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'minScore' => 0.8,
+            'minScore'      => 0.8,
+            'badgePosition' => 'bottomright',
         ]);
     }
 
